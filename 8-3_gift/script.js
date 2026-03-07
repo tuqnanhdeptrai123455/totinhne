@@ -116,9 +116,7 @@ const LETTER = `<div style="text-align:center;margin:8px 0 16px;">
 </div>
 
 <div style="background:${paperBg};border-radius:12px;padding:16px 18px;margin-bottom:16px;border:${paperBorder};box-shadow:inset 0 0 10px rgba(255,255,255,0.5), 0 4px 15px rgba(0,0,0,0.05)">
-  <p style="font-size:16px;line-height:1.9;color:${paperTextColor};margin:0;font-family:'Comic Neue',cursive;text-align:justify;white-space:pre-wrap">
-    ${letterMsg}
-  </p>
+  <p style="font-size:16px;line-height:1.9;color:${paperTextColor};margin:0;font-family:'Comic Neue',cursive;text-align:left;white-space:pre-wrap">${letterMsg}</p>
   ${endingHtml}
 </div>
 
