@@ -1245,8 +1245,17 @@
             display: block !important;
         }
 
-        /* Fully hide all background interactive elements */
-        body.creator-only-mode>*:not(#setup-modal):not(script) {
+        /* Fully hide all background interactive elements and animations */
+        body.creator-only-mode>*:not(#setup-modal):not(script):not(style):not(link) {
+            display: none !important;
+        }
+
+        body.creator-only-mode .night,
+        body.creator-only-mode .magical-flowers,
+        body.creator-only-mode .envelope-wrapper,
+        body.creator-only-mode #garden,
+        body.creator-only-mode #universe,
+        body.creator-only-mode .music-btn {
             display: none !important;
         }
 

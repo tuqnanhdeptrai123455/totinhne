@@ -56,30 +56,39 @@ if (hashLocation.startsWith('#/share/')) {
         try {
             // Try decompression first (new compressed format)
             if (typeof LZString !== 'undefined') {
-                decodedStr = LZString.decompressFromEncodedURIComponent(base64Data);
+                const decompressed = LZString.decompressFromEncodedURIComponent(base64Data);
+                if (decompressed) decodedStr = decompressed;
             }
-        } catch (e) { }
+        } catch (e) { console.warn("LZ Decompression failed", e); }
 
         // Fallback to old base64 parsing if decompression fails
         if (!decodedStr) {
-            decodedStr = decodeURIComponent(escape(atob(base64Data)));
+            try {
+                decodedStr = decodeURIComponent(escape(atob(base64Data)));
+            } catch (e) { console.warn("Base64 decoding failed", e); }
         }
 
-        const shareData = JSON.parse(decodedStr);
+        if (!decodedStr) throw new Error("No decodable data found");
 
-        // Load predefined text from template ID if it exists
+        const shareData = JSON.parse(decodedStr);
+        console.log("Parsed shareData:", shareData);
+
+        // Load base from template
         if (shareData.tmp && TEMPLATES[shareData.tmp]) {
             const tmp = TEMPLATES[shareData.tmp];
             letterTitle = tmp.title;
             letterMsg = tmp.msg;
             letterEnding = tmp.ending || '';
-        } else {
-            if (shareData.t) letterTitle = shareData.t;
-            if (shareData.m) letterMsg = shareData.m;
-            if (shareData.e) letterEnding = shareData.e;
-            if (shareData.q) letterQuote = shareData.q;
-            if (shareData.u) letterUniverse = shareData.u;
+            if (tmp.quote) letterQuote = tmp.quote;
+            if (tmp.universe) letterUniverse = tmp.universe;
         }
+
+        // Apply overrides if exist
+        if (shareData.t) letterTitle = shareData.t;
+        if (shareData.m) letterMsg = shareData.m;
+        if (shareData.e) letterEnding = shareData.e;
+        if (shareData.q) letterQuote = shareData.q;
+        if (shareData.u) letterUniverse = shareData.u;
 
         if (shareData.p) paperStyle = shareData.p;
 
@@ -410,14 +419,15 @@ const copyLinkBtn = document.getElementById('copy-btn');
 const actionButtons = document.querySelectorAll('.action-btn');
 
 // Decide if we are in Creator Mode or Viewing Mode
+const isViewing = hashLocation.startsWith('#/share/') || urlParams.has('t') || urlParams.has('m') || urlParams.has('tmp');
+
+if (!isViewing) {
+    // Creator Mode Active: CSS handles hiding background and fixing scrolling
+    document.body.classList.add('creator-only-mode');
+}
+
 window.onload = () => {
-    // Check if there is a hash payload OR old query parameters
-    const isViewing = hashLocation.startsWith('#/share/') || urlParams.has('t') || urlParams.has('m') || urlParams.has('tmp');
-
     if (!isViewing) {
-        // Creator Mode Active: CSS handles hiding background and fixing scrolling
-        document.body.classList.add('creator-only-mode');
-
         // Show the creator modal
         creatorModal.classList.add('show');
     }
@@ -645,7 +655,6 @@ document.getElementById('go-to-link-btn')?.addEventListener('click', () => {
     const link = document.getElementById('generated-link')?.value;
     if (link) {
         window.open(link, '_blank');
-        playMusic();
     }
 });
 
