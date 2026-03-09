@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Animation</title>
+    <style>
+        body { 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+        #message {
+            position: absolute;
+            font-size: 2em;
+            color: #ff4081;
+            text-align: center;
+            z-index: 10;
+        }
+        #heart {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            transition: transform 0.5s;
+            z-index: 5;
+        }
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: pink;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="message">Chúc cậu 8/3 vui vẻ!</div>
+    <div id="heart" class="pulse">
+        <img src="heart.png" alt="Heart" style="width:100%;"></div>
+    <script>
+        const messageDiv = document.getElementById('message');
+        const heartDiv = document.getElementById('heart');
+        let particles = [];
+
+        function explode() {
+            const rect = heartDiv.getBoundingClientRect();
+            const heartWidth = rect.width;
+            const heartHeight = rect.height;
+            for (let i = 0; i < 100; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                document.body.appendChild(particle);
+                particles.push(particle);
+                const x = Math.random() * heartWidth + rect.left;
+                const y = Math.random() * heartHeight + rect.top;
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.opacity = (Math.random() + 0.2);
+                setTimeout(() => {
+                    particle.style.left = `${Math.random() * window.innerWidth}px`;
+                    particle.style.top = `${Math.random() * window.innerHeight}px`;
+                }, 100);
+            }
+            setTimeout(reassembleHeart, 2000);
+        }
+
+        function reassembleHeart() {
+            particles.forEach(p => {
+                p.style.opacity = '0';
+            });
+            heartDiv.style.transform = 'scale(0)';
+            setTimeout(() => {
+                heartDiv.style.transform = 'scale(1)';
+                particles.forEach(p => {
+                    p.remove();
+                });
+                particles = [];
+            }, 500);
+        }
+
+        heartDiv.addEventListener('click', explode);
+        explode();
+    </script>
+</body>
+</html>
